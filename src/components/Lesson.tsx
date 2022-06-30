@@ -1,7 +1,8 @@
 import { CheckCircle, Lock } from "phosphor-react";
 import { isPast, format } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import shift from "classnames";
 
 interface LessonProps {
   title: string;
@@ -11,6 +12,9 @@ interface LessonProps {
 }
 
 export function Lesson(props: LessonProps) {
+  const { slug } = useParams<{ slug: string }>();
+  const isActiveLesson = slug === props.slug;
+
   const isLessonAvailable = isPast(props.availableAt);
   const availableDateFormatted = format(
     props.availableAt,
@@ -23,10 +27,22 @@ export function Lesson(props: LessonProps) {
   return (
     <Link to={`/event/lesson/${props.slug}`} className="group">
       <span className="text-gray-300">{availableDateFormatted}</span>
-      <div className="rounded border border-gray-500 p-4 mt-2 group-hover:border-green-500">
+      <div
+        className={shift(
+          "rounded border border-gray-500 p-4 mt-2 group-hover:border-green-500",
+          {
+            "bg-green-500 border-green-500": isActiveLesson,
+          }
+        )}
+      >
         <header className="flex items-center justify-between">
           {isLessonAvailable ? (
-            <span className="flex items-center gap-2 text-sm text-blue-500 font-medium">
+            <span
+              className={shift("flex items-center gap-2 text-sm font-medium", {
+                "text-white": isActiveLesson,
+                "text-blue-500": !isActiveLesson,
+              })}
+            >
               <CheckCircle size={20} />
               Conteudo liberado
             </span>
@@ -40,7 +56,14 @@ export function Lesson(props: LessonProps) {
             {props.type === "live" ? "AO VIVO" : "AULA PRÁTICA"}
           </span>
         </header>
-        <strong className="text-gray-200 mt-5 block">{props.title}</strong>
+        <strong
+          className={shift(" mt-5 block", {
+            "text-white": isActiveLesson,
+            "text-gray-200": !isActiveLesson,
+          })}
+        >
+          {props.title}
+        </strong>
       </div>
     </Link>
   );
