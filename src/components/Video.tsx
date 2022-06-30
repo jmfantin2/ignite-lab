@@ -1,12 +1,9 @@
-import {
-  Browsers,
-  CaretRight,
-  DiscordLogo,
-  FileArrowDown,
-  Lightning,
-} from "phosphor-react";
+import { DefaultUi, Player, Youtube } from "@vime/react";
+import { DiscordLogo, Lightning } from "phosphor-react";
 import { Button } from "./gears/Button";
 import { Smartlink } from "./gears/Smartlink";
+
+import "@vime/core/themes/default.css";
 
 export function Video() {
   return (
@@ -16,7 +13,12 @@ export function Video() {
         {/* player container*/}
         <div className="bg-black flex justify-center">
           {/* actual video*/}
-          <div className="bg-white h-full w-full max-w-[1100px] max-h-[60vh] aspect-video"></div>
+          <div className="bg-black h-full w-full max-w-[1100px] max-h-[60vh] aspect-video">
+            <Player>
+              <Youtube videoId="W05FYkqv7hM" />
+              <DefaultUi />
+            </Player>
+          </div>
         </div>
         {/* additional info below player */}
         <div className="p-8 max-w-[1100px] mx-auto">
