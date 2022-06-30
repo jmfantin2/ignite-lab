@@ -1,23 +1,30 @@
 import { gql, useMutation } from "@apollo/client";
 import { useState, FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { Logo } from "../components/Logo";
 
 export function Subscribe() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
   // will run only when createSubscriber is activated in the handler!
-  const [createSubscriber] = useMutation(CREATE_SUBSCRIBER_MUTATION);
+  const [createSubscriber, { loading }] = useMutation(
+    CREATE_SUBSCRIBER_MUTATION
+  );
 
-  function handleSubscribe(event: FormEvent) {
+  async function handleSubscribe(event: FormEvent) {
     event.preventDefault();
     console.log(name, email);
-    createSubscriber({
+    await createSubscriber({
       variables: {
         name,
         email,
       },
     });
+
+    navigate("/event");
   }
 
   return (
@@ -61,10 +68,11 @@ export function Subscribe() {
               onChange={(e) => setEmail(e.target.value)}
             />
             <button
-              className="mt-4 bg-green-500 uppercase py-4 rounded font-bold text-sm hover:bg-green-700 transition-colors"
+              className="mt-4 bg-orange-600 uppercase py-4 rounded font-bold text-sm hover:bg-green-500 transition-colors disabled:bg-green-500"
               type="submit"
+              disabled={loading}
             >
-              Garantir minha vaga
+              {loading ? "Ótimo! Aguarde :)" : "Garantir minha vaga"}
             </button>
           </form>
         </div>
@@ -80,7 +88,7 @@ export function Subscribe() {
 
 // BACKEND: receive the damn data
 const CREATE_SUBSCRIBER_MUTATION = gql`
-  mutation ($name: String!, $email: String!) {
+  mutation createSubscriber($name: String!, $email: String!) {
     createSubscriber(data: { name: $name, email: $email }) {
       id
     }
