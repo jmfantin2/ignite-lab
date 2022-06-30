@@ -1,3 +1,4 @@
+import { gql, useQuery } from "@apollo/client";
 import { DefaultUi, Player, Youtube } from "@vime/react";
 import { DiscordLogo, Lightning } from "phosphor-react";
 import { Button } from "./gears/Button";
@@ -5,7 +6,35 @@ import { Smartlink } from "./gears/Smartlink";
 
 import "@vime/core/themes/default.css";
 
-export function Video() {
+interface VideoProps {
+  lessonSlug: string;
+}
+
+// FRONTEND: type the damn data
+interface GetLessonBySlugResponse {
+  lesson: {
+    title: string;
+    videoId: string;
+    description: string;
+    teacher: {
+      bio: string;
+      avatarURL: string;
+      name: string;
+    };
+  };
+}
+
+export function Video(props: VideoProps) {
+  const { data } = useQuery<GetLessonBySlugResponse>(GET_LESSON_BY_SLUG_QUERY, {
+    variables: {
+      slug: props.lessonSlug,
+    },
+  });
+
+  if (!data) {
+    return <div className="flex-1">Loading</div>;
+  }
+
   return (
     <>
       {/* whole player and description section */}
@@ -15,8 +44,8 @@ export function Video() {
           {/* actual video*/}
           <div className="bg-black h-full w-full max-w-[1100px] max-h-[60vh] aspect-video">
             <Player>
-              <Youtube videoId="W05FYkqv7hM" />
-              <DefaultUi />
+              <Youtube videoId={data.lesson.videoId} />
+              {/*<DefaultUi />*/}
             </Player>
           </div>
         </div>
@@ -27,30 +56,23 @@ export function Video() {
             {/* [COL] lesson title & description*/}
             <div className="flex-1">
               {/* lesson title */}
-              <h1 className="text-2xl font-bold">
-                Aula 01 - Abertura do Ignite Lab
-              </h1>
+              <h1 className="text-2xl font-bold">{data.lesson.title}</h1>
               {/* lesson description */}
               <p className="mt-4 text-gray-200 leading-relaxed">
-                We knew the world would not be the same. A few people laughed. A
-                few people cried. Most people were silent. I remember the line
-                of the hindu scripture, the Bhagavad-Gita. Vishnu is trying to
-                persuade the prince that he should do his duty and, to impress
-                him, takes on his multiarmed form and says "Now I am become
-                death, the destroyer of worlds". I suppose we all thought that,
-                one way or another.
+                {data.lesson.description}
               </p>
-
               <div className="flex items-center gap-4 mt-6">
                 <img
                   className="h-16 w-16 rounded-full border-2 border-orange-500 "
-                  src="https://github.com/helpii.png"
+                  src={data.lesson.teacher.avatarURL}
                   alt=""
                 />
                 <div className="leading-relaxed">
-                  <strong className="font-bold text-2xl block">Helpii</strong>
+                  <strong className="font-bold text-2xl block">
+                    {data.lesson.teacher.name}
+                  </strong>
                   <span className="text-gray-200 text-sm block">
-                    Guiding Spirit @ Helplit
+                    {data.lesson.teacher.bio}
                   </span>
                 </div>
               </div>
@@ -85,3 +107,19 @@ export function Video() {
     </>
   );
 }
+
+// BACKEND: serve the damn data
+const GET_LESSON_BY_SLUG_QUERY = gql`
+  query ($slug: String) {
+    lesson(where: { slug: $slug }) {
+      title
+      videoId
+      description
+      teacher {
+        name
+        bio
+        avatarURL
+      }
+    }
+  }
+`;
