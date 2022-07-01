@@ -75,11 +75,6 @@ export function Subscribe() {
           </form>
         </div>
       </div>
-      <img
-        className="absolute bottom-0 w-full opacity-20 -z-[5]"
-        src="/src/assets/landscape.png"
-        alt=""
-      />
     </div>
   );
 }
